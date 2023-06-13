@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+    <script>
+        let params = new URLSearchParams(document.location.search);
+
+        if (params.get('GTM')) localStorage.setItem('GTM', params.get('GTM'));
+
+        var GTM = localStorage.getItem('GTM');
+    </script>
+    <!-- Put Google Tag Manager integration code here
+        https://developers.google.com/tag-platform/tag-manager/web -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer',GTM);</script>
+
+    <script>
+        window.addEventListener("message", (event) => {
+            if (event.data.type === 'xsolla-tag-manager') {
+                dataLayer.push(event.data.dataLayer);
+            }
+        });
+    </script>
+<body>
+</body>
+</html>
