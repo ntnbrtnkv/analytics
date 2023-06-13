@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <script>
+        var GTM = localStorage.getItem('GTM');
+        var OAUTH2_CLIENT_ID = localStorage.getItem('OAUTH2_CLIENT_ID');
+        var LOGIN_PROJECT_ID = localStorage.getItem('LOGIN_PROJECT_ID');
+        var SITEBUILDER_URL = localStorage.getItem('SITEBUILDER_URL');
+    </script>
+
+    <script src="https://login-sdk.xsolla.com/latest/"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jose/4.14.1/index.umd.min.js"
+            integrity="sha512-1vPhmvq02stHibJ30pSC0959y933StcjbjWEcpk/auAvd6wkr1PFHD8Rgltw21k6hIbx2NUq2GNzw4rfMrGHsQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- paste Google Tag Manager integration code here -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+        })(window,document,'script','dataLayer',GTM);</script>
+</head>
+<body>
+    <div id="xl_auth" style="display: none"></div>
+    <button onclick="showFullscreen()">login</button>
+
+    <script>
+            const currentLocation = location.origin + location.pathname;
+
+            const xl = new XsollaLogin.Widget({
+                preferredLocale: 'en-US',
+                projectId: LOGIN_PROJECT_ID,
+                clientId: OAUTH2_CLIENT_ID,
+                responseType: 'code',
+                redirectUri: currentLocation,
+                state: 'CUSTOM_STATE',
+                scope: 'offline'
+            });
+
+            xl.mount('xl_auth');
+
+            function showFullscreen() {
+                const myDiv = document.querySelector('#xl_auth');
+                myDiv.style.display = 'block';
+
+                xl.open();
+            }
+
+            const sp = new URLSearchParams(document.location.search);
+            const code = sp.get('code');
+            if (code) {
+                window.history.replaceState(null, null, window.location.pathname);
+                var details = {
+                    'grant_type': 'authorization_code',
+                    'scope': 'offline',
+                    'client_id': OAUTH2_CLIENT_ID,
+                    'redirect_uri': currentLocation,
+                    'code': code,
+                };
+
+                var formBody = [];
+                for (var property in details) {
+                    var encodedKey = encodeURIComponent(property);
+                    var encodedValue = encodeURIComponent(details[property]);
+                    formBody.push(encodedKey + "=" + encodedValue);
+                }
+                formBody = formBody.join("&");
+
+                fetch('https://login.xsolla.com/api/oauth2/token', {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'
+                    },
+                    body: formBody
+                })
+                    .then(resp => resp.json())
+                    .then(js => {
+                        const claims = jose.decodeJwt(js.access_token);
+
+                        if (claims.is_new) {
+                            dataLayer.push({
+                                event: 'xsolla-registration',
+                                user_email: claims.email,
+                            });
+                        }
+
+                        window.location.href = `${SITEBUILDER_URL}?token=${js.access_token}&refresh_token=${js.refresh_token}`;
+                    })
+            }
+    </script>
+</body>
+</html>
