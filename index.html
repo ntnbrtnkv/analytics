@@ -7,6 +7,13 @@
     <title>Document</title>
 
     <script>
+        let params = new URLSearchParams(document.location.search);
+
+        if (params.get('GTM')) localStorage.setItem('GTM', params.get('GTM'));
+        if (params.get('OAUTH2_CLIENT_ID')) localStorage.setItem('OAUTH2_CLIENT_ID', params.get('OAUTH2_CLIENT_ID'));
+        if (params.get('LOGIN_PROJECT_ID')) localStorage.setItem('LOGIN_PROJECT_ID', params.get('LOGIN_PROJECT_ID'));
+        if (params.get('SITEBUILDER_URL')) localStorage.setItem('SITEBUILDER_URL', params.get('SITEBUILDER_URL'));
+
         var GTM = localStorage.getItem('GTM');
         var OAUTH2_CLIENT_ID = localStorage.getItem('OAUTH2_CLIENT_ID');
         var LOGIN_PROJECT_ID = localStorage.getItem('LOGIN_PROJECT_ID');
