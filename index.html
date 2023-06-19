@@ -88,12 +88,12 @@
                     .then(js => {
                         const claims = jose.decodeJwt(js.access_token);
 
-                        if (claims.is_new) {
+                        // if (claims.is_new) {
                             dataLayer.push({
                                 event: 'xsolla-registration',
                                 user_email: claims.email,
                             });
-                        }
+                        // }
 
                         window.location.href = `${SITEBUILDER_URL}?token=${js.access_token}&refresh_token=${js.refresh_token}`;
                     })
